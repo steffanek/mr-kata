@@ -21,6 +21,7 @@ export class RoverRepo implements RoverKVStorage {
     return T.succeedWith(() => HM.set_(this.value, roverId, newValue))
   }
 }
+//Question 1: by defining a Class, I can't use the same name..
 export const RoverRepoTag = tag<RoverRepo>()
 // Question 1: By defining as a Class can I derive the Interface?
 // export interface RoverRepo3 extends _A<typeof > {}
