@@ -2,7 +2,9 @@ import { hole } from "../../common/effect-utils"
 import type { Integer } from "../../common/Integer"
 import type { Planet } from "../../planet-context/models/Planet"
 import type { RoverState } from "../models/Rover"
+import type { RoverId } from "../models/RoverId"
 import type { RoverPosition } from "../models/RoverPosition"
+import * as RoverRepo from "../storage/RoverRepo3"
 import type { MoveCommand } from "./Command"
 
 export function modulo(x: Integer, y: Integer) {
@@ -18,10 +20,12 @@ export const addOneTo = add(1 as Integer)
 export const subOneTo = sub(1 as Integer)
 
 export function getNextPosition(
-  roverCurrentState: RoverState,
+  roverId: RoverId["id"],
   planet: Planet,
   command: MoveCommand
 ): RoverPosition {
+  //here I should use T.gen..
+  const roverCurrentState = RoverRepo.get(roverId)
   switch (command._tag) {
     case "MoveForward": {
       switch (roverCurrentState.orientation._tag) {

@@ -27,7 +27,7 @@ import type { RoverId } from "../models/RoverId"
 //and create those inside our App
 
 export function moveHandler(
-  roverId: RoverId, //ID? => UUID => DB
+  roverId: RoverId["id"], //ID? => UUID => DB
   planet: Planet,
   command: MoveCommand
 ): T.IO<CollisionDetected, RoverState> {
