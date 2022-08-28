@@ -1,11 +1,9 @@
 import type { _A } from "../common/effect-utils"
-import { HM, L, pipe, T, tag } from "../common/effect-utils"
+import { L, pipe, T, tag } from "../common/effect-utils"
 import { zeroZeroPosition } from "../config"
 import { PlanetContext } from "../planet-context/PlanetContext"
 import type { MoveCommand, TurnCommand } from "./commands/Command"
-import type { RoverState } from "./models/Rover"
 import { makeRoverState } from "./models/Rover"
-import type { RoverId } from "./models/RoverId"
 import { makeRoverId } from "./models/RoverId"
 import { RoverOrientation } from "./models/RoverOrientation"
 import { moveHandler, turnHandler } from "./processors.ts/singleCommand"
@@ -28,19 +26,14 @@ export const makeRoverContext = T.gen(function* (_) {
 
   //Save that initial state locally (inMemory):
   const roverRepo = yield* _(RoverRepo3)
-
+  const RoverHasHMap = roverRepo.make()
   const roverId = makeRoverId("1").id
-  const emptyHashMap = HM.make<RoverId["id"], RoverState>()
-  const RoverHashMap = pipe(emptyHashMap, HM.set(roverId, rover))
-
   //Question 1: I would like to us the roverRepo, but it doesn't work this way..
-  const RoverHashMap2 = pipe(roverRepo.make(), roverRepo.set(roverId, rover))
-
-  const getRoverState = roverRepo.get(roverId)
+  const saveInitialState = pipe(RoverHasHMap, T.chain(roverRepo.set(roverId, rover)))
 
   //Define API
   //Read context:
-  const getCurrentState = pipe(RoverHashMap, HM.get(roverId))
+  const getCurrentState = yield* _(pipe(RoverHasHMap, T.chain(roverRepo.get(roverId))))
 
   //Write context, those should return void..(side effect change state):
   const move = (command: MoveCommand) => moveHandler(roverId, planet, command)

@@ -10,9 +10,12 @@ import type { RoverId } from "../models/RoverId"
 
 export const makeLiveRoverRepo3 = T.succeedWith(() => ({
   make: () => T.succeedWith(() => HM.make<RoverId["id"], RoverState>()),
-  set: (roverId: RoverId["id"], value: RoverState) =>
-    T.succeedWith(() => HM.set(roverId, value)),
-  get: (roverId: RoverId["id"]) => T.succeedWith(() => HM.get(roverId))
+  set:
+    (roverId: RoverId["id"], value: RoverState) =>
+    (self: HM.HashMap<RoverId["id"], RoverState>) =>
+      T.succeedWith(() => HM.set(roverId, value)),
+  get: (roverId: RoverId["id"]) => (self: HM.HashMap<RoverId["id"], RoverState>) =>
+    T.succeedWith(() => HM.get(roverId))
 }))
 
 export interface RoverRepo3 extends _A<typeof makeLiveRoverRepo3> {}
@@ -20,10 +23,10 @@ export interface RoverRepo3 extends _A<typeof makeLiveRoverRepo3> {}
 export const RoverRepo3 = tag<RoverRepo3>()
 
 //utilities to use in our program, they require the Repo
-export const { get, make, set } = T.deriveLifted(RoverRepo3)(
-  ["make", "set", "get"],
-  [],
-  []
-)
+// export const { get, make, set } = T.deriveLifted(RoverRepo3)(
+//   ["make", "set", "get"],
+//   [],
+//   []
+// )
 
 export const LiveRoverRepo3 = L.fromEffect(RoverRepo3)(makeLiveRoverRepo3)
