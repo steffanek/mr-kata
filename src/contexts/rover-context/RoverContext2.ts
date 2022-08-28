@@ -9,7 +9,7 @@ import type { RoverId } from "./models/RoverId"
 import { makeRoverId } from "./models/RoverId"
 import { RoverOrientation } from "./models/RoverOrientation"
 import { moveHandler, turnHandler } from "./processors.ts/singleCommand"
-import { RoverRepo3 } from "./storage/RoverRepo3"
+import { RoverRepo2 } from "./storage/RoverRepo2"
 
 //This Context should represent a concrete implementation as an Effect, with Dependency, Error and Result Expected
 //State initial: Yes
@@ -27,14 +27,14 @@ export const makeRoverContext = T.gen(function* (_) {
   const rover = makeRoverState(zeroZeroPosition, RoverOrientation.North)
 
   //Save that initial state locally (inMemory):
-  const roverRepo = yield* _(RoverRepo3)
+  const roverRepo = yield* _(RoverRepo2)
 
   const roverId = makeRoverId("1").id
   const emptyHashMap = HM.make<RoverId["id"], RoverState>()
   const RoverHashMap = pipe(emptyHashMap, HM.set(roverId, rover))
 
   //Question 1: I would like to us the roverRepo, but it doesn't work this way..
-  const RoverHashMap2 = pipe(roverRepo.make(), roverRepo.set(roverId, rover))
+  const RoverHashMap2 = pipe(emptyHashMap, roverRepo.set(roverId, rover))
 
   const getRoverState = roverRepo.get(roverId)
 

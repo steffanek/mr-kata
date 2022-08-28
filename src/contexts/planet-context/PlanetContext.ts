@@ -11,7 +11,9 @@ import { makePlanet } from "./models/Planet"
 
 export const makePlanetContext = T.gen(function* (_) {
   //To make a planet
-  //Problem: ObstacleContext give me only 1 obstacle..
+  //Question: ObstacleContext give me only 1 obstacle..
+  //I want to have a function from the ObstacleContext, that I can add more Obstacle
+  //I've attempt to make such function under "Obstacle.ts"
   const obstacles = yield* _(ObstacleContext)
   const planet = makePlanet(gridSize10x10, obstacles)
   return planet

@@ -12,9 +12,10 @@ export function makeObstacle(position: ObstaclePosition): Obstacle {
 
 export const addOneObstacle = (obstacle: Obstacle) => HS.add(obstacle)
 
-// export function makeObstaclesHashSet(...obstacles: Obstacle[]) {
-//   return pipe(
-//     HS.make<Obstacle>(),
-//     HS.reduce(identity, (identity, o) => HS.add(obstacles))
-//   )
-// }
+export const addMultipleObstacle = (...obstacles: readonly Obstacle[]) => {
+  return (self: HS.HashSet<Obstacle>) => obstacles.forEach((o) => pipe(self, HS.add(o)))
+}
+
+export const addMultipleObstacle2 = (...obstacles: readonly Obstacle[]) => {
+  return (self: HS.HashSet<Obstacle>) => obstacles.forEach((o) => pipe(self, HS.add(o)))
+}

@@ -27,7 +27,7 @@ export const makeRoverContext = T.gen(function* (_) {
 
   //Save that initial state locally (inMemory):
   const roverRepo = yield* _(RoverRepo)
-  //Question: yield, yield, its not bad performance?
+  //Question: yield, yield, is it ok?
   const roverCurrentState = yield* _(yield* _(roverRepo.create(rover)))
 
   //Define API
@@ -38,6 +38,7 @@ export const makeRoverContext = T.gen(function* (_) {
   const move = (command: MoveCommand) => moveHandler(getCurrentState, planet, command)
   const turn = (command: TurnCommand) => turnHandler(getCurrentState, planet, command)
 
+  //Here I want to expose the API
   return {
     Read: {
       getCurrentState

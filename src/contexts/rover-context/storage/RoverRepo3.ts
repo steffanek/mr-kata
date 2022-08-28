@@ -9,10 +9,10 @@ import type { RoverState } from "../models/Rover"
 import type { RoverId } from "../models/RoverId"
 
 export const makeLiveRoverRepo3 = T.succeedWith(() => ({
-  make: () => T.succeedWith(() => HM.make<RoverId, RoverState>()),
-  set: (roverId: RoverId, value: RoverState) =>
-    T.succeedWith(() => HM.set(roverId.id, value)),
-  get: (roverId: RoverId) => T.succeedWith(() => HM.get(roverId.id))
+  make: () => T.succeedWith(() => HM.make<RoverId["id"], RoverState>()),
+  set: (roverId: RoverId["id"], value: RoverState) =>
+    T.succeedWith(() => HM.set(roverId, value)),
+  get: (roverId: RoverId["id"]) => T.succeedWith(() => HM.get(roverId))
 }))
 
 export interface RoverRepo3 extends _A<typeof makeLiveRoverRepo3> {}

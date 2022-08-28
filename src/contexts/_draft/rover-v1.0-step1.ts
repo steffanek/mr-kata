@@ -22,12 +22,11 @@ export class GrideSizeTag extends Tagged("GridSize")<{
 }> {}
 
 //Question: do we really need to use tag everywhere?
-//We don't really need to tag everything
-//We wouldn't need a Tag Type for the GridSize
-//its cool to have identified type
-//If we want a Case without specific Tag, we can do:
+//Answer: We don't really need to tag everything
+// - We wouldn't need a Tag Type for the GridSize
+//- its cool to have identified type
+//- If we want a Case without specific Tag, we can do:
 //- it has the same property  Case: copy, destructure equal
-//Question what does it mean?
 export class GrideSizeCase extends Case<{
   readonly width: number
   readonly height: number
@@ -131,18 +130,6 @@ export const roverInitialState = new RoverState({
   }),
   orientation: new North()
 })
-
-// Question with type from the Interface vs. here
-// export const makeRoverRepo = T.gen(function* (_) {
-//   const { create, get, set } = yield* _(RoverRepo)
-
-//   return {
-//     create: (roverInitialState: RoverState) => !Ref.makeRef(roverInitialState),
-//     get: (roverInitialState: Ref.Ref<RoverState>) => Ref.get(roverInitialState),
-//     set: (roverInitialState: Ref.Ref<RoverState>, stateValue: RoverState) =>
-//       Ref.set_(roverInitialState, stateValue)
-//   }
-// })
 
 export const makeLiveRoverRepo = T.succeedWith(
   (): RoverRepo => ({

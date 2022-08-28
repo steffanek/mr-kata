@@ -11,7 +11,7 @@ export function moveForwardHandler(
   roverCurrentState: RoverState,
   planet: Planet,
   command: MoveForward
-): T.Effect<unknown, never, void> {
+): T.IO<never, void> {
   switch (roverCurrentState.orientation._tag) {
     case "North": {
       return RoverRepo.set(

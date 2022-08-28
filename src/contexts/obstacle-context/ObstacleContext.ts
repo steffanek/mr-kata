@@ -7,9 +7,6 @@ import { obstaclesHash } from "../config"
 //State can change: No (it's fixed)
 //Dependency: No
 
-// const obstacle1 = makeObstacle(obstaclePosition0x4)
-// const obstacle2 = makeObstacle(obstaclePosition0x6)
-
 export const makeObstacleContext = T.succeedWith(() => obstaclesHash)
 
 export interface ObstacleContext extends _A<typeof makeObstacleContext> {}
