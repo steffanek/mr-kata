@@ -1,4 +1,4 @@
-import { Obstacle } from "@app/contexts/obstacle-context/models/Obstacle"
+import { makeObstacle } from "@app/contexts/obstacle-context/models/Obstacle"
 import { ObstaclePosition } from "@app/contexts/obstacle-context/models/ObstaclePosition"
 
 import { HS, T } from "../../common/effect-utils"
@@ -11,12 +11,14 @@ import {
   turnRightHandler
 } from "../commands/handlers"
 import { getNextPosition } from "../commands/helpers"
-import { CollisionDetected } from "../errors/Errors"
+import { makeCollisionDetected, makeRoverStateNotFound } from "../errors"
 import type { RoverState } from "../models/Rover"
 import type { RoverId } from "../models/RoverId"
+import { RoverContext } from "../RoverContext4"
+import type { RoverRepo } from "../storage/RoverRepo4"
+// import { RoverRepoTag } from "../storage/RoverRepo4"
 
 //2 types of Commands: Move and Turn
-
 //Those processors will process either a Move or a Turn command
 // and check business constraints, if requirement are match, they can process the command by
 // delegating to the appropriate handler that will change the state
@@ -28,59 +30,112 @@ import type { RoverId } from "../models/RoverId"
 
 export function moveHandler(
   roverId: RoverId["id"], //ID? => UUID => DB
+  roverRepo: RoverRepo, //Question 1: Do I need to inject the Repo? or I can just use the Interface?
   planet: Planet,
   command: MoveCommand
-): T.IO<CollisionDetected, RoverState> {
+) {
   //I imported the Repo so I can use it the utilities..
   //I'm programming to an interface..
+  return T.gen(function* (_) {
+    // const repo = yield* _(RoverRepoTag)
 
-  const nextPosition = getNextPosition(roverCurrentState, planet, command)
-  const isCollisionDetected = HS.has_(planet.obstacles["position"], nextPosition)
-  if (isCollisionDetected) {
-    return T.fail(
-      new CollisionDetected({
-        obstacle: new Obstacle({
-          position: new ObstaclePosition({
-            x: nextPosition.x,
-            y: nextPosition.y
-          })
-        }),
-        roverPosition: roverCurrentState.position
-      })
-    )
-  }
-  switch (command._tag) {
-    case "MoveForward": {
-      return T.succeedWith(() => moveForwardHandler(roverCurrentState, planet, command))
+    const roverCurrentState = yield* _(roverRepo.get(roverId))
+    switch (roverCurrentState._tag) {
+      case "None": {
+        return yield* _(T.fail(makeRoverStateNotFound(roverId)))
+      }
+      case "Some": {
+        const nextPosition = getNextPosition(roverCurrentState.value, planet, command)
+        const isCollisionDetected = HS.has_(planet.obstacles["position"], nextPosition)
+        if (isCollisionDetected) {
+          const obstacle = makeObstacle(
+            new ObstaclePosition({
+              x: nextPosition.x,
+              y: nextPosition.y
+            })
+          )
+          const roverPosition = roverCurrentState.value.position
+          return yield* _(T.fail(makeCollisionDetected(obstacle, roverPosition)))
+        }
+        switch (command._tag) {
+          case "MoveForward": {
+            return yield* _(
+              moveForwardHandler(
+                roverId,
+                roverCurrentState.value,
+                roverRepo,
+                planet,
+                command
+              )
+            )
+          }
+          case "MoveBack": {
+            return yield* _(
+              moveBackHandler(
+                roverId,
+                roverCurrentState.value,
+                roverRepo,
+                planet,
+                command
+              )
+            )
+          }
+        }
+      }
     }
-    case "MoveBack": {
-      return T.succeedWith(() => moveBackHandler(roverCurrentState, planet, command))
-    }
-  }
+  })
 }
 
 export function turnHandler(
-  roverCurrentState: RoverState,
+  roverId: RoverId["id"], //ID? => UUID => DB
+  roverRepo: RoverRepo, //Question 1: Do I need to inject the Repo? or I can just use the Interface?
   planet: Planet,
   command: TurnCommand
-): T.IO<CollisionDetected, RoverState> {
-  switch (command._tag) {
-    case "TurnLeft": {
-      return T.succeedWith(() => turnLeftHandler(roverCurrentState, planet, command))
+) {
+  return T.gen(function* (_) {
+    // const repo = yield* _(RoverRepoTag)
+    const roverCurrentState = yield* _(roverRepo.get(roverId))
+    switch (roverCurrentState._tag) {
+      case "None": {
+        return yield* _(T.fail(makeRoverStateNotFound(roverId)))
+      }
+      case "Some": {
+        switch (command._tag) {
+          case "TurnLeft": {
+            return yield* _(
+              turnLeftHandler(
+                roverId,
+                roverCurrentState.value,
+                roverRepo,
+                planet,
+                command
+              )
+            )
+          }
+          case "TurnRight": {
+            return yield* _(
+              turnRightHandler(
+                roverId,
+                roverCurrentState.value,
+                roverRepo,
+                planet,
+                command
+              )
+            )
+          }
+        }
+      }
     }
-    case "TurnRight": {
-      return T.succeedWith(() => turnRightHandler(roverCurrentState, planet, command))
-    }
-  }
+  })
 }
 
-export function processSingleCommand(
-  roverCurrentState: RoverState,
-  planet: Planet,
-  command: RoverCommand
-): T.IO<CollisionDetected, RoverState> {
-  if (command._tag === "MoveForward" || command._tag === "MoveBack") {
-    return moveHandler(roverCurrentState, planet, command)
-  }
-  return turnHandler(roverCurrentState, planet, command)
+export function processSingleCommand(command: RoverCommand) {
+  return T.gen(function* (_) {
+    const rover = yield* _(RoverContext)
+
+    if (command._tag === "MoveForward" || command._tag === "MoveBack") {
+      return yield* _(rover.Write.move(command))
+    }
+    // return yield* _(rover.Write.turn(command))
+  })
 }

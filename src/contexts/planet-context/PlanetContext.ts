@@ -1,7 +1,10 @@
 import type { _A } from "../common/effect-utils"
-import { HS, L, pipe, T, tag } from "../common/effect-utils"
+import { L, T, tag } from "../common/effect-utils"
 import { gridSize10x10 } from "../config"
-import { ObstacleContext } from "../obstacle-context/ObstacleContext"
+import {
+  LiveObstacleContext,
+  ObstacleContext
+} from "../obstacle-context/ObstacleContext"
 import { makePlanet } from "./models/Planet"
 
 //This Context should represent a concrete implementation as an Effect, with Dependency, Error and Result Expected
@@ -25,4 +28,4 @@ export const PlanetContext = tag<PlanetContext>()
 
 export const LivePlanetContext = L.fromEffect(PlanetContext)(makePlanetContext)
 
-export const PlanetContextDependency = LivePlanetContext
+export const PlanetContextDependency = LivePlanetContext["<<<"](LiveObstacleContext)
