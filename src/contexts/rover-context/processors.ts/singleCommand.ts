@@ -12,7 +12,6 @@ import {
 } from "../commands/handlers"
 import { getNextPosition } from "../commands/helpers"
 import { makeCollisionDetected, makeRoverStateNotFound } from "../errors"
-import type { RoverState } from "../models/Rover"
 import type { RoverId } from "../models/RoverId"
 import { RoverContext } from "../RoverContext4"
 import type { RoverRepo } from "../storage/RoverRepo4"

@@ -29,13 +29,13 @@ export const makeRoverContext = T.gen(function* (_) {
   const roverRepo = yield* _(RoverRepoTag)
   const roverId = makeRoverId("1").id
   //This should be a void result..
-  roverRepo.set(roverId, rover)
+  yield* _(roverRepo.set(roverId, rover))
 
   //Define API
   //Read context:
   //Question 1: this gives an Option, should I leave it this way?
   const getCurrentState = yield* _(roverRepo.get(roverId))
-
+  console.log("from Context", getCurrentState)
   //Should I inject the REPO?
   //Write context, those should return void..(side effect change state):
   const move = (command: MoveCommand) =>

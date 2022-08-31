@@ -1,4 +1,4 @@
-import { HS, Tagged } from "@app/contexts/common/effect-utils"
+import { HS, pipe, Tagged } from "@app/contexts/common/effect-utils"
 
 import type { ObstaclePosition } from "./ObstaclePosition"
 

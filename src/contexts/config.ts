@@ -1,4 +1,4 @@
-import { HS, pipe, T } from "./common/effect-utils"
+import { HS, pipe } from "./common/effect-utils"
 import type { Integer } from "./common/Integer"
 import {
   addMultipleObstacle,
